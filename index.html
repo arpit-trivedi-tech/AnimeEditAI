@@ -1,15 +1,12 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AnimeEditAI</title>
+  <title>AnimeEditAI - Fixed</title>
   <style>
-    body { font-family: Arial; text-align: center; background: #121212; color: white; }
-    canvas { border: 1px solid white; margin-top: 20px; }
-    select, button { padding: 10px; margin: 10px; }
-    #watermark { position: absolute; bottom: 10px; left: 10px; color: white; font-size: 14px; }
+    body { font-family: Arial; background: #121212; color: white; text-align: center; padding: 20px; }
+    canvas { border: 2px solid #fff; margin-top: 20px; }
+    button, select { padding: 10px; margin: 10px; font-size: 16px; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -22,29 +19,37 @@
   <br>
   <button onclick="generate()">Generate Edit</button>
   <button onclick="download()">Download Image</button>
-  <br>
+  <br><br>
   <canvas id="canvas" width="720" height="1280"></canvas>
+  <p style="color: gray;">If nothing appears, please upload a valid <b>background.jpg</b> to this repo.</p>
+
   <script>
-    const backgroundUrl = 'background.jpg';
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const watermark = '@Mr.Arpit_trivedi';
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const watermark = "@Mr.Arpit_trivedi";
 
     async function generate() {
-      const quote = document.getElementById('quoteSelect').value;
+      const quote = document.getElementById("quoteSelect").value;
       const img = new Image();
-      img.src = backgroundUrl;
+      img.src = "background.jpg?" + new Date().getTime(); // avoid cache
       img.onload = () => {
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'white';
-        ctx.font = '30px Arial';
+        ctx.fillStyle = "white";
+        ctx.font = "28px Arial";
         ctx.fillText(quote, 30, canvas.height - 100);
-        ctx.font = '20px Arial';
+        ctx.font = "20px Arial";
         ctx.fillText(watermark, 30, canvas.height - 40);
-        const utterance = new SpeechSynthesisUtterance(quote);
-        utterance.lang = 'en-US';
-        speechSynthesis.speak(utterance);
-      }
+        try {
+          const utterance = new SpeechSynthesisUtterance(quote);
+          utterance.lang = "en-US";
+          speechSynthesis.speak(utterance);
+        } catch (err) {
+          alert("Speech failed: " + err.message);
+        }
+      };
+      img.onerror = () => {
+        alert("⚠️ Error loading background.jpg. Make sure it's uploaded in your GitHub repo.");
+      };
     }
 
     function download() {
