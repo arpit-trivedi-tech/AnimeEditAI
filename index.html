@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AnimeEditAI</title>
+  <style>
+    body { font-family: Arial; text-align: center; background: #121212; color: white; }
+    canvas { border: 1px solid white; margin-top: 20px; }
+    select, button { padding: 10px; margin: 10px; }
+    #watermark { position: absolute; bottom: 10px; left: 10px; color: white; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>AnimeEditAI</h1>
+  <select id="quoteSelect">
+    <option value="A lesson without pain is meaningless – Edward Elric">Edward Elric</option>
+    <option value="Power comes in response to a need, not a desire – Goku">Goku</option>
+    <option value="Hard work is worthless for those that don’t believe in themselves – Naruto">Naruto</option>
+  </select>
+  <br>
+  <button onclick="generate()">Generate Edit</button>
+  <button onclick="download()">Download Image</button>
+  <br>
+  <canvas id="canvas" width="720" height="1280"></canvas>
+  <script>
+    const backgroundUrl = 'background.jpg';
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const watermark = '@Mr.Arpit_trivedi';
+
+    async function generate() {
+      const quote = document.getElementById('quoteSelect').value;
+      const img = new Image();
+      img.src = backgroundUrl;
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '30px Arial';
+        ctx.fillText(quote, 30, canvas.height - 100);
+        ctx.font = '20px Arial';
+        ctx.fillText(watermark, 30, canvas.height - 40);
+        const utterance = new SpeechSynthesisUtterance(quote);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function download() {
+      const link = document.createElement('a');
+      link.download = 'anime_edit.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
+</body>
+</html>
